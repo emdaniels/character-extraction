@@ -1,9 +1,16 @@
 CHARACTER EXTRACTION
 ====================
 
-The purpose of this program is to extract the names of fictional characters from a novel and analyze the sentences the characters appear in or are referenced in within the text in order to build a profile containing data specific to each character. It was created using the 32-bit version of Python 2.7 with the Natural Language Toolkit and Pattern libraries. 
+The purpose of this program is to extract the names of fictional characters 
+from a novel and analyze the sentences the characters appear in or are 
+referenced in within the text in order to build a profile containing data 
+specific to each character. It was created using the 32-bit version of Python 
+2.7 with the Natural Language Toolkit and Pattern libraries. 
 
-To change the book to be analyzed, add the book as a text file to the same file directory as the program, change the name of the text file on line 27 of the file and rerun the program. You can also have the book file in a different directory and reference the file path to the book instead.
+To change the book to be analyzed, add the book as a text file to the same 
+file directory as the program, change the name of the text file on line 27 
+of the file and rerun the program. You can also have the book file in a 
+different directory and reference the file path to the book instead.
 
 Author: Emily Daniels
 Date: April 2014
