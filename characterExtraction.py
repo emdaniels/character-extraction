@@ -1,21 +1,23 @@
-""" Filename: characterExtraction.py
+#! /usr/bin/env python2
+
+"""
+Filename: characterExtraction.py
 Author: Emily Daniels
 Date: April 2014
 Purpose: Extracts character names from a text file and performs analysis of
 text sentences containing the names.
-Reference: See README.txt file for additional references """
+Reference: See README.txt file for additional references
+"""
 
 import json
 import nltk
 import re
-from collections import Counter
-from collections import defaultdict
+from collections import Counter, defaultdict
 from nltk.corpus import stopwords
 from pattern.en import parse, Sentence, mood
 from pattern.db import csv
 from pattern.vector import Document, NB
 
-text = []
 entityNames = []
 chunkedSentences = ()
 majorCharacters = []
@@ -26,22 +28,20 @@ characterTones = defaultdict(list)
 sentenceAnalysis = defaultdict(list)
 
 
-""" Reads the text from a text file. """
-
-
-def readText(text):
+def readText():
+    """ Reads the text from a text file. """
     with open("730.txt", "rb") as f:
-        text = f.read()
+        text = f.read().decode('utf-8-sig')
     return text
 
-text = readText(text)
+text = readText()
 
 
-""" Parses text into parts of speech tagged with parts of speech labels.
-Used for reference: https://gist.github.com/onyxfish/322906 """
-
-
-def getChunkedSentences(chunkedSentences, text):
+def getChunkedSentences(text):
+    """
+    Parses text into parts of speech tagged with parts of speech labels.
+    Used for reference: https://gist.github.com/onyxfish/322906
+    """
     sentences = nltk.sent_tokenize(text)
     tokenizedSentences = [nltk.word_tokenize(sentence)
                           for sentence in sentences]
@@ -50,15 +50,15 @@ def getChunkedSentences(chunkedSentences, text):
     chunkedSentences = nltk.batch_ne_chunk(taggedSentences, binary=True)
     return chunkedSentences
 
-chunkedSentences = getChunkedSentences(chunkedSentences, text)
-
-
-""" Creates a local list to hold nodes of tree passed through, extracting named
- entities from the chunked sentences.
-Used for reference: https://gist.github.com/onyxfish/322906 """
+chunkedSentences = getChunkedSentences(text)
 
 
 def extractEntityNames(tree):
+    """
+    Creates a local list to hold nodes of tree passed through, extracting named
+    entities from the chunked sentences.
+    Used for reference: https://gist.github.com/onyxfish/322906
+    """
     entityNames = []
     try:
         if hasattr(tree, 'node') and tree.node:
@@ -72,23 +72,20 @@ def extractEntityNames(tree):
     return entityNames
 
 
-""" Uses the global entity list, creating a new dictionary with the properties
-extended by the local list, without overwriting.
-used for reference: https://gist.github.com/onyxfish/322906 """
-
-
 def extendDict(chunkedSentences, entityNames):
+    """
+    Uses the global entity list, creating a new dictionary with the properties
+    extended by the local list, without overwriting.
+    Used for reference: https://gist.github.com/onyxfish/322906
+    """
     for tree in chunkedSentences:
         entityNames.extend(extractEntityNames(tree))
-    return entityNames
 
-entityNames = extendDict(chunkedSentences, entityNames)
-
-
-""" Brings in stopwords and customstopwords to filter mismatches out. """
+extendDict(chunkedSentences, entityNames)
 
 
 def removeStopwords(entityNames):
+    """ Brings in stopwords and customstopwords to filter mismatches out. """
     with open("customStopWords.txt", "rb") as f:
         customStopwords = f.read().split(', ')
     for name in entityNames:
@@ -99,23 +96,22 @@ def removeStopwords(entityNames):
 entityNames = removeStopwords(entityNames)
 
 
-""" Adds names to the major character list if they appear frequently. """
-
-
-def getMajorCharacters(entityNames, majorCharacters):
+def getMajorCharacters(entityNames):
+    """ Adds names to the major character list if they appear frequently. """
+    majorCharacters = set()
     for name in entityNames:
         if entityNames.count(name) > 10:
-            majorCharacters.append(name)
+            majorCharacters.add(name)
     return majorCharacters
 
-majorCharacters = list(set(getMajorCharacters(entityNames, majorCharacters)))
-
-
-""" Split sentences on .?! "" and not on abbreviations of titles.
-Used for reference: http://stackoverflow.com/a/8466725 """
+majorCharacters = getMajorCharacters(entityNames)
 
 
 def splitIntoSentences(text):
+    """
+    Split sentences on .?! "" and not on abbreviations of titles.
+    Used for reference: http://stackoverflow.com/a/8466725
+    """
     sentenceEnders = re.compile(r"""
     # Split sentences on whitespace between them.
     (?:               # Group for two positive lookbehinds.
@@ -136,11 +132,11 @@ def splitIntoSentences(text):
 sentenceList = splitIntoSentences(text)
 
 
-""" Compares the list of sentences with the character names and returns
-sentences that include names. """
-
-
 def compareLists(sentenceList, majorCharacters, characterSentences):
+    """
+    Compares the list of sentences with the character names and returns
+    sentences that include names.
+    """
     for sentence in sentenceList:
         for name in majorCharacters:
             if re.search(r"\b(?=\w)%s\b(?!\w)" % name, sentence,
@@ -152,24 +148,22 @@ characterSentences = compareLists(sentenceList, majorCharacters,
                                   characterSentences)
 
 
-""" Analyzes the sentence using grammatical mood module from pattern. """
-
-
 def extractMood(characterSentences, characterMoods):
+    """ Analyzes the sentence using grammatical mood module from pattern. """
     for key, value in characterSentences.iteritems():
         for x in value:
-            characterMoods[key].append(mood(Sentence
-                                            (parse(str(x), lemmata=True))))
+            characterMoods[key].append(mood(Sentence(parse(str(x),
+                                                           lemmata=True))))
     return characterMoods
 
 characterMoods = extractMood(characterSentences, characterMoods)
 
 
-""" Trains a Naive Bayes classifier object with the reviews.csv file, analyzes
-the sentence, and returns the tone. """
-
-
 def extractSentiment(characterSentences, characterTones):
+    """
+    Trains a Naive Bayes classifier object with the reviews.csv file, analyzes
+    the sentence, and returns the tone.
+    """
     nb = NB()
     for review, rating in csv("reviews.csv"):
         nb.train(Document(review, type=int(rating), stopwords=True))
@@ -181,19 +175,15 @@ def extractSentiment(characterSentences, characterTones):
 characterTones = extractSentiment(characterSentences, characterTones)
 
 
-""" Merges sentences, moods and tones together into one dictionary on each
- character. """
-
-
+# Merges sentences, moods and tones together into one dictionary on each
+# character.
 sentenceAnalysis = dict([(k, [characterSentences[k],
                               characterTones[k],
                               characterMoods[k]]) for k in characterSentences])
 
 
-""" Writes the sentence analysis to a text file in the same directory. """
-
-
 def writeAnalysis(sentenceAnalysis):
+    """ Writes the sentence analysis to a text file in the same directory. """
     with open("sentenceAnalysis.txt", "wb") as f:
         for item in sentenceAnalysis.items():
             f.write("%s:%s\n" % item)
@@ -201,10 +191,8 @@ def writeAnalysis(sentenceAnalysis):
 writeAnalysis(sentenceAnalysis)
 
 
-""" Writes the sentence analysis to a JSON file in the same directory. """
-
-
 def writeToJSON(sentenceAnalysis):
+    """ Writes the sentence analysis to a JSON file in the same directory. """
     with open("sentenceAnalysis.json", "wb") as f:
         json.dump(sentenceAnalysis, f)
 
