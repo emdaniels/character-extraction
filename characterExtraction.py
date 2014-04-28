@@ -6,7 +6,6 @@ Author: Emily Daniels
 Date: April 2014
 Purpose: Extracts character names from a text file and performs analysis of
 text sentences containing the names.
-Reference: See README.txt file for additional references
 """
 
 import json
