@@ -45,7 +45,7 @@ NLTK corpora are provided under the terms given in the README file
 for each corpus; all are redistributable, and available for non-commercial use.
 NLTK may be freely redistributed, subject to the provisions of these licenses.
 
-https://github.com/nltk/nltk/blob/develop/README.txt
+https://github.com/nltk/nltk/blob/develop/LICENSE.txt
 
 Pattern
 -------
@@ -63,3 +63,21 @@ examples and 350+ unit tests. The source code is licensed under BSD and
 available from http://www.clips.ua.ac.be/pages/pattern.
 
 https://github.com/clips/pattern/blob/master/README.txt
+
+
+License
+=======
+
+Copyright 2014-2015 Emily Daniels
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
