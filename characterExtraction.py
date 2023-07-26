@@ -105,7 +105,7 @@ def removeStopwords(entityNames, customStopWords=None):
     # Memoize custom stop words
     if customStopWords is None:
         with open("customStopWords.txt", "rb") as f:
-            customStopwords = f.read().split(', ')
+            customStopwords = f.read().decode('utf-8-sig').split(', ')
 
     for name in entityNames:
         if name in stopwords.words('english') or name in customStopwords:
