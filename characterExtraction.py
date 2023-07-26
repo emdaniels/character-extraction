@@ -29,6 +29,12 @@ try:
 except LookupError:
     nltk.download('punkt')
 
+# https://github.com/clips/pattern/issues/295#issuecomment-841625057
+try:
+    parse('dummy sentence')
+except RuntimeError:
+    pass
+
 
 def readText():
     """
