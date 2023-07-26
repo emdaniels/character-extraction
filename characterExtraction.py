@@ -18,6 +18,17 @@ from pattern.en import parse, Sentence, mood
 from pattern.db import csv
 from pattern.vector import Document, NB
 
+# Download resources automatically if not installed
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
 
 def readText():
     """
