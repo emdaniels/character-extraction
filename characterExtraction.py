@@ -8,15 +8,16 @@ Purpose: Extracts character names from a text file and performs analysis of
 text sentences containing the names.
 """
 
+from collections import defaultdict
 import json
-import nltk
 import re
 
-from collections import defaultdict
+import nltk
 from nltk.corpus import stopwords
 from pattern.en import parse, Sentence, mood
 from pattern.db import csv
 from pattern.vector import Document, NB
+
 
 def readText():
     """
@@ -196,7 +197,7 @@ if __name__ == "__main__":
     entityNames = buildDict(chunkedSentences)
     removeStopwords(entityNames)
     majorCharacters = getMajorCharacters(entityNames)
-    
+
     sentenceList = splitIntoSentences(text)
     characterSentences = compareLists(sentenceList, majorCharacters)
     characterMoods = extractMood(characterSentences)
@@ -209,6 +210,6 @@ if __name__ == "__main__":
                                          characterTones[k],
                                          characterMoods[k]])
                                     for k in characterSentences])
-    
+
     writeAnalysis(sentenceAnalysis)
     writeToJSON(sentenceAnalysis)
