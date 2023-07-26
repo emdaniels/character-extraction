@@ -162,7 +162,7 @@ def extractMood(characterSentences):
     Analyzes the sentence using grammatical mood module from pattern.
     """
     characterMoods = defaultdict(list)
-    for key, value in characterSentences.iteritems():
+    for key, value in characterSentences.items():
         for x in value:
             characterMoods[key].append(mood(Sentence(parse(str(x),
                                                            lemmata=True))))
@@ -178,7 +178,7 @@ def extractSentiment(characterSentences):
     characterTones = defaultdict(list)
     for review, rating in csv("reviews.csv"):
         nb.train(Document(review, type=int(rating), stopwords=True))
-    for key, value in characterSentences.iteritems():
+    for key, value in characterSentences.items():
         for x in value:
             characterTones[key].append(nb.classify(str(x)))
     return characterTones
