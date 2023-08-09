@@ -8,15 +8,33 @@ Purpose: Extracts character names from a text file and performs analysis of
 text sentences containing the names.
 """
 
+from collections import defaultdict
 import json
-import nltk
 import re
 
-from collections import defaultdict
+import nltk
 from nltk.corpus import stopwords
 from pattern.en import parse, Sentence, mood
 from pattern.db import csv
 from pattern.vector import Document, NB
+
+# Download resources automatically if not installed
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+# https://github.com/clips/pattern/issues/295#issuecomment-841625057
+try:
+    parse('dummy sentence')
+except RuntimeError:
+    pass
+
 
 def readText():
     """
@@ -93,7 +111,7 @@ def removeStopwords(entityNames, customStopWords=None):
     # Memoize custom stop words
     if customStopWords is None:
         with open("customStopWords.txt", "rb") as f:
-            customStopwords = f.read().split(', ')
+            customStopwords = f.read().decode('utf-8-sig').split(', ')
 
     for name in entityNames:
         if name in stopwords.words('english') or name in customStopwords:
@@ -150,7 +168,7 @@ def extractMood(characterSentences):
     Analyzes the sentence using grammatical mood module from pattern.
     """
     characterMoods = defaultdict(list)
-    for key, value in characterSentences.iteritems():
+    for key, value in characterSentences.items():
         for x in value:
             characterMoods[key].append(mood(Sentence(parse(str(x),
                                                            lemmata=True))))
@@ -166,7 +184,7 @@ def extractSentiment(characterSentences):
     characterTones = defaultdict(list)
     for review, rating in csv("reviews.csv"):
         nb.train(Document(review, type=int(rating), stopwords=True))
-    for key, value in characterSentences.iteritems():
+    for key, value in characterSentences.items():
         for x in value:
             characterTones[key].append(nb.classify(str(x)))
     return characterTones
@@ -196,7 +214,7 @@ if __name__ == "__main__":
     entityNames = buildDict(chunkedSentences)
     removeStopwords(entityNames)
     majorCharacters = getMajorCharacters(entityNames)
-    
+
     sentenceList = splitIntoSentences(text)
     characterSentences = compareLists(sentenceList, majorCharacters)
     characterMoods = extractMood(characterSentences)
@@ -209,6 +227,6 @@ if __name__ == "__main__":
                                          characterTones[k],
                                          characterMoods[k]])
                                     for k in characterSentences])
-    
+
     writeAnalysis(sentenceAnalysis)
     writeToJSON(sentenceAnalysis)
